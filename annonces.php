@@ -13,8 +13,11 @@ else{
     echo 'Erreur de login et/ou de mot de passe (redirection automatique dans 5 sec.)';
     exit;
 }
+
+require 'View/annonces.php';
 ?>
 
 <?php
 mysqli_close( $link );
 ?>
+

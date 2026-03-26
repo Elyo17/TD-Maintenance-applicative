@@ -1,8 +1,7 @@
 <?php
-/**
- * Fichier de configuration
- * Le fichier config.php ne doit JAMAIS être versionné
- */
+// Charge les variables d'environnement depuis le fichier .env
+// QUI NE DOIT PAS ETRE COMMIT
+$env = parse_ini_file(__DIR__ . '/.env');
 
 // Configuration de la base de données
 define('DB_HOST', 'mysql-maamari.alwaysdata.net');

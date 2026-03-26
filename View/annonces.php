@@ -6,7 +6,25 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 </head>
 <body>
-<p> Hello <?php echo $_POST['login']; ?> </p>
+
+<?php
+if( !isset( $login) or $login == '' ){
+    header( "refresh:5;url=index.php" );
+    echo 'Erreur de login et/ou de mot de passe (redirection automatique dans 5 sec.)';
+    exit;
+}
+?>
+
+<?php $login = $_POST['login'];?>
+
+<?php $annonces = array();
+while ($row = mysqli_fetch_assoc($resultall)) {
+$annonces[] = $row;
+}
+?>
+
+<p> Hello <?php echo $login; ?> </p>
+
 <h1>List of Posts</h1>
 <ul>
     <?php foreach( $annonces as $post ) : ?>
