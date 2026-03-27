@@ -4,8 +4,9 @@
 $env = parse_ini_file(__DIR__ . '/.env');
 
 // Configuration de la base de données
-define('DB_HOST', 'mysql-maamari.alwaysdata.net');
-define('DB_USER', 'maamari_annonces');
-define('DB_PASS', 'Alousse17074&');
-define('DB_NAME', 'maamari_annonces_db');
+define('DB_HOST', $env['DB_HOST']);
+define('DB_USER', $env['DB_USER']);
+define('DB_PASS', $env['DB_PASSWORD']);
+define('DB_NAME', $env['DB_NAME']);
+
 ?>

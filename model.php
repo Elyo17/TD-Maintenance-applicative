@@ -1,16 +1,23 @@
 <?php
+//permet d'ouvrir et fermé la connexion
 function openConnection()
 {
-    $link = mysqli_connect('mysql', '[compte]_annonces', 'pwd', '[compte]_annonces_db');
-    return $link;
+    try{
+        $dbh = new PDO('mysql:host=localhost;dbname=tdmaintenance', 'root', '');
+    }catch(PDOException $e)
+    {
+        print "Erreur de connexion!: " . $e->getMessage() . "<br/>";
+        die;
+    }
+    return $dbh;
 }
 
-function closeConnection($link)
+function closeConnection($dbh)
 {
-    mysqli_close($link);
+    $dbh = null;
 }
 
-
+//Vérifie si l'utilisateur est enregistré
 function isUser( $login, $password )
 {
     $isuser = False ;
@@ -26,5 +33,37 @@ function isUser( $login, $password )
     closeConnection($link);
 
     return $isuser;
+}
+
+//Retourne un tableau assossiatif
+function getAllAnnonces()
+{
+    $link = openConnection();
+
+    $result = mysqli_query($link,'SELECT id, title FROM Post');
+    $annonces = array();
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $annonces[] = $row;
+    }
+
+    mysqli_free_result( $result);
+    closeConnection($link);
+
+    return $annonces;
+}
+
+//Qui retourne l'annonce ayant l'identifiant passé en paramètre
+function getPost( $id )
+{
+    $link = openConnection();
+
+    $id = intval($id);
+    $result = mysqli_query($link, 'SELECT * FROM Post WHERE id='.$id );
+    $post = mysqli_fetch_assoc($result);
+
+    mysqli_free_result( $result);
+    closeConnection($link);
+    return $post;
 }
 ?>
