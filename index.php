@@ -1,20 +1,38 @@
 <?php
-include 'Model.php';
-include 'Controllers.php';
-include 'config.php';
-$controller = null;
+include_once 'config.php';
+// charge et initialise les bibliothèques globales
+include_once 'data/DataAccess.php';
+include_once 'control/Controllers.php';
+include_once 'control/Presenter.php';
+include_once 'service/AnnoncesChecking.php';
+include_once 'gui/ViewLogin.php';
+include_once 'gui/ViewAnnonces.php';
+include_once 'gui/ViewPost.php';
 
+use gui\{Layout, ViewAnnonces, ViewLogin, ViewPost};
+use control\{Controllers, Presenter};
+use data\DataAccess;
+use service\AnnoncesChecking;
+
+$data = null;
 try {
     // construction du modèle
-    $data = new Model( new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASS) );
+    $data = new DataAccess( new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASS) );
 
-    // initialisation du controller
-    $controller = new Controllers( $data );
 
 } catch (PDOException $e) {
     print "Erreur de connexion !: " . $e->getMessage() . "<br/>";
     die();
 }
+
+// initialisation du controller
+$controller = new Controllers();
+
+// intialisation du cas d'utilisation AnnoncesChecking
+$annoncesCheck = new AnnoncesChecking() ;
+
+// intialisation du presenter avec accès aux données de AnnoncesCheking
+$presenter = new Presenter($annoncesCheck);
 
 // chemin de l'URL demandée au navigateur
 // (p.ex. /annonces/index.php)
@@ -23,17 +41,31 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 // route la requête en interne
 // i.e. lance le bon contrôleur en focntion de la requête effectuée
 if ( '/' == $uri || '/index.php' == $uri) {
-    $controller->loginAction();
+
+    $layout = new Layout("view/layout.html" );
+    $vueLogin = new ViewLogin( $layout );
+
+    $vueLogin->display();
 }
 elseif ( '/index.php/annonces' == $uri
     && isset($_POST['login']) && isset($_POST['password']) ){
 
-    $controller->annoncesAction($_POST['login'], $_POST['password']);
+    $controller->annoncesAction($_POST['login'], $_POST['password'], $data, $annoncesCheck);
+
+    $layout = new Layout("view/layout.html" );
+    $vueAnnonces= new ViewAnnonces( $layout, $_POST['login'], $presenter);
+
+    $vueAnnonces->display();
 }
 elseif ( '/index.php/post' == $uri
     && isset($_GET['id'])) {
 
-    $controller->annoncesAction($_POST['login'], $_POST['password']);
+    $controller->postAction($_GET['id'], $data, $annoncesCheck);
+
+    $layout = new Layout("view/layout.html" );
+    $vuePost= new ViewPost( $layout, $presenter );
+
+    $vuePost->display();
 }
 else {
     header('Status: 404 Not Found');
